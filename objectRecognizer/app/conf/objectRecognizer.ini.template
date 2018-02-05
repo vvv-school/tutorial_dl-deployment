@@ -1,0 +1,7 @@
+prototxt_file /path/to/deploy_imDataLayer.prototxt
+label_file /path/to/labels.txt
+caffemodel_file /path/to/model.caffemodel
+blob_name prob
+
+compute_mode CPU
+device_id 0
