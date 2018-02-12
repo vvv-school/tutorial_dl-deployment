@@ -3,8 +3,8 @@
 Contents:
 
 * [Get ready for this tutorial](#get-ready-for-this-tutorial)
-* [Complete the tutorial](#omplete-the-tutorial)
-* [Run the module on the robot and/or with different models](#run-the-module-on-the-robot-and-or-with-different-models)
+* [Complete the tutorial](#complete-the-tutorial)
+* [Run the module on the robot and with different models](#run-the-module-on-the-robot-and-with-different-models)
 
 ## Get ready for this tutorial
 
