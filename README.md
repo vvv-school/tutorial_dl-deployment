@@ -86,15 +86,15 @@ $ gedit deploy_MemoryData_caffenet.prototxt
 
 1. At line 10, replace the following:
 
-  ~~~
-  mean_file: "/path/to/train_mean.binaryproto"
-  ~~~
+    ~~~
+    mean_file: "/path/to/train_mean.binaryproto"
+    ~~~
 
-  with the correct absolute path to this file on your system (without using env variables). This is the binary file containing the mean image of the training set that we created and used during the training in the assignment. If you use the VM and followed instructions, it should be:
+    with the correct absolute path to this file on your system (without using env variables). This is the binary file containing the mean image of the training set that we created and used during the training in the assignment. If you use the VM and followed instructions, it should be:
 
-  ~~~
-  mean_file: "/home/icub/robot-code/dl-lab/assignment_dl-tuning/cat_4categories/mean.binaryproto"
-  ~~~
+    ~~~
+    mean_file: "/home/icub/robot-code/dl-lab/assignment_dl-tuning/cat_4categories/mean.binaryproto"
+    ~~~
 
 2. At line 216, set the `num_output` parameter of the `fc8N` layer to the correct number of classes that you model discriminates (4 in the task of the assignment).
 
@@ -143,26 +143,26 @@ We are now ready to run the YARP module:
 
 1. Ensure that the camera of you laptop is accessible from the VM. This can be done when the VM is running. In the following we try to provide some instructions depending on the software that you are using:
 
- - For `Parallels Desktop`, under the `Devices` tab, select `USB & Bluetooth`, `Configure`, and then check the box `Share Mac camera with Linux`.
+    - For `Parallels Desktop`, under the `Devices` tab, select `USB & Bluetooth`, `Configure`, and then check the box `Share Mac camera with Linux`.
 
- - For `Virtual Box`, under the `Devices` tab, select `USB` and then `USB Settings...`. In the opened panel, check that `USB 2.0` is selected and that the entry related to your camera is enabled.
+    - For `Virtual Box`, under the `Devices` tab, select `USB` and then `USB Settings...`. In the opened panel, check that `USB 2.0` is selected and that the entry related to your camera is enabled.
 
- - For `VMWare Client`, under the `Virtual Machine` tab, select `Removable Devices`, then select the entry of the laptop camera and check `Connect`.
+    - For `VMWare Client`, under the `Virtual Machine` tab, select `Removable Devices`, then select the entry of the laptop camera and check `Connect`.
 
 2. Lunch the YARP Server:
-  ~~~
-  $ yarp server
-  ~~~
+    ~~~
+    $ yarp server
+    ~~~
 
 3. Lunch that YARP Manager:
-  ~~~
-  $ yarpmanager
-  ~~~
+    ~~~
+    $ yarpmanager
+    ~~~
 
 4. Lunch a YARP Run called `/lh`:
-  ~~~
-  $ yarprun --server /lh
-  ~~~
+    ~~~
+    $ yarprun --server /lh
+    ~~~
 
 5. In the YARP Manager, open the `Object_Recognizer` application that you should see listed in the tab to the left, run and connect all modules.
 
