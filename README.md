@@ -190,7 +190,7 @@ Response: [ack]
 Response: 80
 ~~~
 
-## Run the module on the robot and/or with different models
+## Run the module on the robot and with different models
 
 In this part we provide some indications to run the module on the robot and to use different network models.
 
