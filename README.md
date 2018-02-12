@@ -72,7 +72,7 @@ We first need to configure a `.prototxt` file which defines the architecture of 
 To this end, we could have used the `deploy.prototxt`. However, using this file implies that all pre-processing operations that must be done on the image before feeding it to the network (like subtracting the mean image of the training set, extracting a crop, converting it to a `caffe::Blob`, etc.) are implemented by the user. You can see an example of this in the [classify_image_list_vvv.cpp](https://github.com/vvv-school/tutorial_dl-tuning/blob/master/scripts/src/classify_image_list_vvv.cpp) script that we used in the tutorial and assignment on fine-tuning.
 In our case, we should have implemented these operations in the YARP module, after reading the image from a port and before passing the data to Caffe APIs.
 
-However, this is prone to errors and a small error in the preprocessing can have a great impact on performance. To this end, since in our case we can use `OpenCV` and deal with `cv::Mat` images, we opted instead to use the `MemoryData` layer ([link](http://caffe.berkeleyvision.org/tutorial/layers/memorydata.html])) provided by Caffe. This layer offers an interface that takes directly a `cv::Mat` as input, and converts it to a `caffe::Blob` by applying internally the preprocessing operations that we mentioned.
+However, this is prone to errors and a small error in the preprocessing can have a great impact on performance. To this end, since in our case we can use `OpenCV` and deal with `cv::Mat` images, we opted instead to use the `MemoryData` layer ([link](http://caffe.berkeleyvision.org/tutorial/layers/memorydata.html)) provided by Caffe. This layer offers an interface that takes directly a `cv::Mat` as input, and converts it to a `caffe::Blob` by applying internally the preprocessing operations that we mentioned.
 
 To this end, in this repository we provided a template `.prototxt` file that uses a `MemoryData` layer. We now only have to check and adapt it to have identical structure to the model that we trained.
 
@@ -107,6 +107,7 @@ To do this we modify the following file:
 ~~~
 $ cd ~/.local/share/yarp/contexts/objectRecognizer
 $ cp objectRecognizer.ini.template objectRecognizer.ini
+$ gedit objectRecognizer.ini
 ~~~
 
 And set:
@@ -163,9 +164,9 @@ We are now ready to run the YARP module:
   $ yarprun --server /lh
   ~~~
 
-4. In the YARP Manger, open the `Object_Recognizer` application that you should see listed in the tab to the left, run and connect all modules.
+5. In the YARP Manager, open the `Object_Recognizer` application that you should see listed in the tab to the left, run and connect all modules.
 
-At this point you should see two YARP Views: one is displaying the image streamed by the camera, with a green bounding box and the predicted label written over it, and the other one is displaying the scores produced by the network (the `prob` blob that we extract, which is also output of the module if you lunch it from the terminale).
+At this point you should see two YARP Views: one is displaying the image streamed by the camera, with a green bounding box and the predicted label written over it, and the other one is displaying the scores produced by the network (the `prob` blob that we extract, which is also outputted by the module at each frame, you can see this if you launch the `objectRecognizer` from the terminal).
 
 The network is classifying the image area inside the green bounding box. Restricting the region of interest to a smaller region, instead of classifying the full image, is very useful since the presence of noise in the background is reduced. You can play with the side of the region and see if enlarging it (eventually also placing two different objects inside the region!) deteriorates predictions. To do this, send commands to an RPC port in the following way:
 
@@ -196,7 +197,7 @@ In this part we provide some indications to run the module on the robot and to u
 
 #### Run on the robot
 
-In this simple application we did not consider more elaborated approaches to localize the region of interest, and fixed it at the image center. However, this `objectRecognizer` module can also take inputs from other modules, for instance the [dispBlobber](https://github.com/robotology/segmentation/tree/master/dispBlobber), which segments the closest blob in the disparity map and provides its coordinates as output. This allows to classify a varying area on the image, which can be easily controlled by moving the object of interest in front of the camera. Clearly, this implies that an RGB-D sensor, or a stereo camera like the one on the iCub, provides a disparity map :-).
+In this simple application we did not consider more elaborated approaches to localize the region of interest, and fixed it at the image center. However, this `objectRecognizer` module can also take inputs from other modules, for instance the [dispBlobber](https://github.com/robotology/segmentation/tree/master/dispBlobber), which segments the closest blob in the disparity map and provides its coordinates as output. This allows to classify a varying area on the image, which can be easily controlled by moving the object of interest in front of the camera. Clearly, this implies that an RGB-D sensor, or a stereo camera like the one on the iCub, provides the disparity map :-).
 
 If you run your `objectRecognizer` on the robot, together with the `dispBlobber`, you can connect the following ports:
 
@@ -211,13 +212,13 @@ in order to get the stream of coordinates as input. By setting, via RPC port, th
 
 This module can run with any valid Caffe model, provided that the needed configuration/weight files are available.
 
-1. For example, you can configure the module in order to use the network that we trained in the [tutorial](https://github.com/vvv-school/tutorial_dl-tuning), rather than the one trained in the assignment. To do this, you can go through the steps that we described in this README, and configure the `objectRecognizer.ini` file to point to a different `.caffemodel`, a different `labels.txt` and a different `.prototxt` (that you will have set with different number of outputs and a different image mean).
+1. For example, you can configure the module in order to use the network that we trained in the [tutorial](https://github.com/vvv-school/tutorial_dl-tuning), rather than the one trained in the assignment. To do this, you can go through the steps that we described in this README, and configure the `objectRecognizer.ini` file to point to the related `final.caffemodel` and `labels.txt` files, and to a `deploy_MemoryData_caffenet.prototxt` that you will have set with a different number of outputs (2 in the case of the tutorial) and the image mean of the training set used in that case.
 
-2. Furthermore, you can repeat the [assignment](https://github.com/vvv-school/assignment_dl-tuning) by training on a different task (remember that the train/val/test image sets are configured in the `imageset_config.yml` file), and then deploy the resulting model in YARP with the `objectRecognizer`, possibly on the robot.
+2. Furthermore, you can repeat the [assignment](https://github.com/vvv-school/assignment_dl-tuning) by training on a task of your choice (remember that the train/val/test image sets are configured in the [imageset_config.yml](https://github.com/vvv-school/assignment_dl-tuning/blob/master/cat_4categories/imageset_config.yml) file), and deploy the resulting model in YARP with the provided `objectRecognizer`.
 
-3. Finally, if you want to play more with these things, you can also acquire your own image sequences, train a network on them by using the scripts that we provided in the [assignment](https://github.com/vvv-school/assignment_dl-tuning), and finally deploy it in YARP with the `objectRecognizer`. To do this, you can follow these general instructions (and ask for help if needed):
+3. Finally, if you want to play more with these things, you can also acquire your own image sequences, train a network on them (by using the scripts that we provided in the [assignment](https://github.com/vvv-school/assignment_dl-tuning)) and, finally, deploy it in YARP with the `objectRecognizer`. To do this, you can follow these general instructions (and ask for help if needed!):
 
-  1. Run a `yarpdev --device opencv_grabber`, like we did to stream images in YARP from your laptop's camera
-  2. Connect its output to a [yarpdatadumper](http://www.yarp.it/yarpdatadumper.html) to record image sequences on disk
-  3. Format the sequences to match the iCW dataset format (note that if you want to change the directory tree apart from changing the names of the categories, you have to modify accordingly not only the `imageset_config.yml` file, but also the functions in [python-utils](https://github.com/vvv-school/assignment_dl-tuning/tree/master/scripts/python_utils))
-  4. Adapt the `train_and_test_net.sh` to use (i) your own dataset instead of iCW and (ii) the network configuration files that you will have configured considering the new classification task. To this end, consider that, once you have generated your own train/val/test image lists, all the rest of the pipeline is quite unchanged.
+    1. Run a `yarpdev --device opencv_grabber`, like we did to stream images in YARP from your laptop's camera
+    2. Connect its output to a [yarpdatadumper](http://www.yarp.it/yarpdatadumper.html) to record image sequences on disk
+    3. Format the sequences to match the iCW dataset format (note that if you want to change the directory tree apart from changing the names of the categories, you have to modify accordingly not only the `imageset_config.yml` file, but also the functions in [python-utils](https://github.com/vvv-school/assignment_dl-tuning/tree/master/scripts/python_utils))
+    4. Adapt the `train_and_test_net.sh` to use (i) your own dataset instead of iCW and (ii) the network configuration files that you will have configured considering the new classification task. To this end, consider that, once you have generated your own train/val/test image lists, all the rest of the pipeline is quite unchanged.
