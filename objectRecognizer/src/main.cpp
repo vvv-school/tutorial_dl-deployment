@@ -213,7 +213,7 @@ private:
                 		if (scores[class_idx] > max_score)
                 		{
                 			max_idx = class_idx;
-                            max_score = scores[max_idx];
+                                        max_score = scores[max_idx];
                 		}
                 	}
 
@@ -247,7 +247,7 @@ private:
                     	// draw
                     	for (int bin_idx=0; bin_idx<n_classes; bin_idx++)
                     	{
-                    		int bin_top = img_hist_height*(int)(1.0f - scores[bin_idx]);
+                                int bin_top = (int)(img_hist_height*(1.0f - scores[bin_idx]));
                     		cv::rectangle(img_hist_mat, cv::Point(bin_idx*bin_width,bin_top),
                                         cv::Point((bin_idx+1)*bin_width,bin_bottom),
                     					colors[bin_idx%(int)colors.size()],CV_FILLED);

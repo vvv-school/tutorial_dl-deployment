@@ -1,4 +1,4 @@
-name: "CaffeNet"
+name: "CaffeNet_iCubWorld"
 layer {
   name: "data"
   type: "MemoryData"
@@ -213,7 +213,7 @@ layer {
   bottom: "fc7"
   top: "fc8N"
   inner_product_param {
-    num_output: 21
+    num_output: FILLME
   }
 }
 layer {
