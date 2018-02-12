@@ -1,4 +1,4 @@
-# Fine-tuning a deep CNN with Caffe
+# Deploy a Caffe model in YARP
 
 Contents:
 
