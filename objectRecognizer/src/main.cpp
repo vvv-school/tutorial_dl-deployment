@@ -19,6 +19,8 @@
 #include <yarp/math/Math.h>
 #include <yarp/math/Rand.h>
 
+#include <yarp/cv/Cv.h>
+
 #include <highgui.h>
 #include <cv.h>
 #include <opencv2/opencv.hpp>
@@ -42,6 +44,7 @@ using namespace yarp;
 using namespace yarp::os;
 using namespace yarp::sig;
 using namespace yarp::math;
+using namespace yarp::cv;
 
 class ObjectRecognizerPort: public BufferedPort<Image>
 {
@@ -81,7 +84,7 @@ private:
         {
 
             // convert from RGB to BGR
-            img_mat = cv::cvarrToMat((IplImage*)img.getIplImage());
+            img_mat = toCvMat(img);
             cv::cvtColor(img_mat, img_mat, CV_RGB2BGR);
 
             // extract the crop: init variables
@@ -241,7 +244,7 @@ private:
                         int bin_bottom = img_hist_height;
 
                         // int auxiliary images
-                        cv::Mat img_hist_mat = cv::cvarrToMat(img_hist.getIplImage());
+                        cv::Mat img_hist_mat = toCvMat(img_hist);
                         cv::Mat img_text_mat = cv::Mat::zeros(img_hist.width(), img_hist.height(), CV_8UC3);
 
                         // draw

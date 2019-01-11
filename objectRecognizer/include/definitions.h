@@ -8,9 +8,9 @@
 
 #define         ACK            VOCAB3('a','c','k')
 
-#define			CENTROID	   VOCAB3('c','e','n')
-#define			ROI	           VOCAB3('r','o','i')
-#define			FIXED	       VOCAB3('f','i','x')
+#define         CENTROID       VOCAB3('c','e','n')
+#define         ROI            VOCAB3('r','o','i')
+#define         FIXED          VOCAB3('f','i','x')
 
 #define         CMD_SET        VOCAB3('s','e','t')
 #define         CMD_GET        VOCAB3('g','e','t')

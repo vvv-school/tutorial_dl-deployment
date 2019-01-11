@@ -5,8 +5,8 @@ cmake_minimum_required(VERSION 2.8)
 project(objectRecognizer)
 
 # mandatory use of these packages
-find_package(YARP REQUIRED)
 find_package(ICUBcontrib REQUIRED)
+find_package(YARP 3.1.100 REQUIRED COMPONENTS OS sig math cv)
 find_package(Caffe REQUIRED)
 find_package(OpenCV REQUIRED)
 
