@@ -46,7 +46,6 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/caffe-version.h.in
                ${CMAKE_CURRENT_BINARY_DIR}/caffe-version.h
                @ONLY)
 set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
-add_definitions(${Caffe_DEFINITIONS})    # ex. -DCPU_ONLY
 
 include_directories(${YARP_INCLUDE_DIRS})
 include_directories(${OpenCV_INCLUDE_DIRS})
@@ -61,6 +60,7 @@ source_group("Source Files" FILES ${folder_source})
 source_group("Header Files" FILES ${folder_header})
 
 add_executable(${PROJECT_NAME} ${folder_source} ${folder_header})
+target_compile_definitions(${PROJECT_NAME} PRIVATE ${Caffe_DEFINITIONS})
 
 target_link_libraries(${PROJECT_NAME} ${YARP_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBRARIES})
