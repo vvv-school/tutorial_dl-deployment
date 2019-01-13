@@ -1,5 +1,5 @@
 # requires minimum cmake version
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.5)
 
 # produce the cmake var PROJECT_NAME
 project(objectRecognizer)
@@ -11,12 +11,9 @@ find_package(Caffe REQUIRED)
 find_package(OpenCV REQUIRED)
 
 # extend the current search path used by cmake to load helpers
-list(APPEND CMAKE_MODULE_PATH ${YARP_MODULE_PATH})
 list(APPEND CMAKE_MODULE_PATH ${ICUBCONTRIB_MODULE_PATH})
-# list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 
-# helpers defining certain macros (e.g. "yarp_install")
-include(YarpInstallationHelpers)
+# helpers defining certain macros
 include(ICUBcontribHelpers)
 include(ICUBcontribOptions)
 
@@ -47,17 +44,12 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/caffe-version.h.in
                @ONLY)
 set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 
-include_directories(${YARP_INCLUDE_DIRS})
-include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(${Caffe_INCLUDE_DIRS})
 include_directories(${PROJECT_SOURCE_DIR}/${PROJECT_NAME}/include)
 
 set(folder_source ${PROJECT_NAME}/src/main.cpp)
 set(folder_header ${PROJECT_NAME}/include/CaffeWrapper.hpp
                   ${PROJECT_NAME}/include/definitions.h)
-
-source_group("Source Files" FILES ${folder_source})
-source_group("Header Files" FILES ${folder_header})
 
 add_executable(${PROJECT_NAME} ${folder_source} ${folder_header})
 target_compile_definitions(${PROJECT_NAME} PRIVATE ${Caffe_DEFINITIONS})
@@ -78,3 +70,4 @@ yarp_install(FILES ${scripts} DESTINATION ${ICUBCONTRIB_APPLICATIONS_INSTALL_DIR
 
 # generate ad-hoc project to perform "make uninstall"
 icubcontrib_add_uninstall_target()
+

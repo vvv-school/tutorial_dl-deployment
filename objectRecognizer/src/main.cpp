@@ -7,7 +7,6 @@
 #include <yarp/os/RFModule.h>
 #include <yarp/os/Time.h>
 #include <yarp/os/BufferedPort.h>
-#include <yarp/os/RateThread.h>
 #include <yarp/os/Semaphore.h>
 #include <yarp/os/RpcClient.h>
 #include <yarp/os/PortReport.h>
@@ -276,7 +275,7 @@ private:
                         for (int i=0; i<scores.size(); i++)
                         {
                             Bottle &b = scores_bottle.addList();
-                            b.addString(labels[i].c_str());
+                            b.addString(labels[i]);
                             b.addDouble(scores[i]);
                         }
                         port_out_scores.write(scores_bottle);
@@ -312,15 +311,15 @@ public:
     ObjectRecognizerPort(ResourceFinder &rf) : BufferedPort<Image>()
     {
         // Binary file (.caffemodel) containing the network's weights
-        string caffemodel_file = rf.check("caffemodel_file", Value("/path/to/model.caffemodel")).asString().c_str();
+        string caffemodel_file = rf.check("caffemodel_file", Value("/path/to/model.caffemodel")).asString();
         cout << "Setting .caffemodel file to " << caffemodel_file << endl;
 
         // Text file (.prototxt) defining the network structure
-        string prototxt_file = rf.check("prototxt_file", Value(" /path/to/deploy_imDataLayer.prototxt")).asString().c_str();
+        string prototxt_file = rf.check("prototxt_file", Value(" /path/to/deploy_imDataLayer.prototxt")).asString();
         cout << "Setting .prototxt file to " << prototxt_file << endl;
 
         // Name of blob to be extracted
-        string blob_name = rf.check("blob_name", Value("prob")).asString().c_str();
+        string blob_name = rf.check("blob_name", Value("prob")).asString();
         cout << "Setting blob_name to " << blob_name << endl;
 
         // Compute mode and eventually GPU ID to be used
@@ -337,7 +336,7 @@ public:
             compute_mode, device_id);
 
             // labels
-            string label_file = rf.check("label_file", Value("/path/to/labels.txt")).asString().c_str();;
+            string label_file = rf.check("label_file", Value("/path/to/labels.txt")).asString();
             cout << "Setting labels.txt to " << label_file << endl;
 
             ifstream infile;
@@ -389,17 +388,16 @@ public:
             BufferedPort<Image>::useCallback();
 
             // module name
-            string name = rf.find("name").asString().c_str();
+            string name = rf.find("name").asString();
 
             // inout ports
-            port_in_centroid.open(("/"+name+"/centroid:i").c_str());
-            port_in_roi.open(("/"+name+"/roi:i").c_str());
+            port_in_centroid.open("/"+name+"/centroid:i");
+            port_in_roi.open("/"+name+"/roi:i");
 
             // output ports
-            port_out_view.open(("/"+name+"/view:o").c_str());
-            port_out_scores.open(("/"+name+"/scores:o").c_str());
-            port_out_hist.open(("/"+name+"/hist:o").c_str());
-
+            port_out_view.open("/"+name+"/view:o");
+            port_out_scores.open("/"+name+"/scores:o");
+            port_out_hist.open("/"+name+"/hist:o");
         }
 
         bool set_radius(int _radius)
@@ -519,7 +517,7 @@ public:
             Time::turboBoost();
 
             // module name
-            string name = rf.find("name").asString().c_str();
+            string name = rf.find("name").asString();
 
             // input port
             imagePort = new ObjectRecognizerPort(rf);
@@ -533,9 +531,9 @@ public:
             imagePort->set_crop_mode(crop_mode);
 
             // rpc ports
-            rpcPortHuman.open(("/"+name+"/human:io").c_str());
+            rpcPortHuman.open("/"+name+"/human:io");
 
-            rpcPort.open(("/"+name+"/rpc").c_str());
+            rpcPort.open("/"+name+"/rpc");
             attach(rpcPort);
 
             return true;
@@ -609,7 +607,7 @@ public:
                     {
                         if (command.size()>2)
                         {
-                            string property = command.get(1).asString().c_str();
+                            string property = command.get(1).asString();
 
                             if (property == "radius")
                             {
@@ -648,7 +646,7 @@ public:
                     {
                         if (command.size()>1)
                         {
-                            string property = command.get(1).asString().c_str();
+                            string property = command.get(1).asString();
 
                             if (property=="radius")
                             {
