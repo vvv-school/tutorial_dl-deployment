@@ -7,7 +7,6 @@
 #include <yarp/os/RFModule.h>
 #include <yarp/os/Time.h>
 #include <yarp/os/BufferedPort.h>
-#include <yarp/os/Semaphore.h>
 #include <yarp/os/RpcClient.h>
 #include <yarp/os/PortReport.h>
 #include <yarp/os/Stamp.h>
@@ -24,7 +23,6 @@
 #include <cv.h>
 #include <opencv2/opencv.hpp>
 
-#include <stdio.h>
 #include <cstdio>
 #include <cstdlib> // getenv
 #include <string>
@@ -34,6 +32,7 @@
 #include <iostream>
 #include <fstream>
 #include <list>
+#include <mutex>
 
 #include "CaffeWrapper.hpp"
 #include "definitions.h"
@@ -48,10 +47,8 @@ using namespace yarp::cv;
 class ObjectRecognizerPort: public BufferedPort<Image>
 {
 private:
-
     // Resource Finder and module options
-
-    Semaphore              mutex;
+    mutex                  mtx;
 
     cv::Mat                img_mat;
     cv::Mat                img_crop_mat;
@@ -75,8 +72,7 @@ private:
 
     void onRead(Image &img)
     {
-
-        mutex.wait();
+        lock_guard<mutex> lck(mtx);
 
         // If something arrived...
         if (img.width()>0 && img.height()>0)
@@ -134,7 +130,6 @@ private:
                 default:
                 {
                     std::cout<< "Non valid crop_mode!" << std::endl;
-                    mutex.post();
                     return;
                 }
             }
@@ -176,7 +171,6 @@ private:
                     default:
                     {
                         std::cout<< "Non valid crop_mode!" << std::endl;
-                        mutex.post();
                         return;
                     }
                 }
@@ -194,7 +188,6 @@ private:
                     if (!caffe_wrapper->forward(img_crop_mat, scores))
                     {
                         std::cout << "forward(): failed..." << std::endl;
-                        mutex.post();
                         return;
                     }
                     if (scores.size()!=n_classes)
@@ -202,7 +195,6 @@ private:
                         std::cout << n_classes << std::endl;
                         std::cout << scores.size() << std::endl;
                         std::cout << "number of labels differs from number of scores!" << std::endl;
-                        mutex.post();
                         return;
                     }
 
@@ -301,9 +293,6 @@ private:
             }
 
         }
-
-        mutex.post();
-
     }
 
 public:
@@ -404,9 +393,8 @@ public:
         {
             if (_radius>0)
             {
-                mutex.wait();
+                lock_guard<mutex> lck(mtx);
                 radius = _radius;
-                mutex.post();
                 return true;
             }
             else
@@ -415,9 +403,8 @@ public:
 
         bool get_radius(int &_radius)
         {
-            mutex.wait();
+            lock_guard<mutex> lck(mtx);
             _radius = radius;
-            mutex.post();
         }
 
         bool set_crop_mode(int _crop_mode)
@@ -425,26 +412,23 @@ public:
             if (_crop_mode!=FIXED && _crop_mode!=CENTROID && _crop_mode!=ROI)
             return false;
 
-            mutex.wait();
+            lock_guard<mutex> lck(mtx);
             crop_mode = _crop_mode;
-            mutex.post();
 
             return true;
         }
 
         bool get_crop_mode(int &_crop_mode)
         {
-            mutex.wait();
+            lock_guard<mutex> lck(mtx);
             _crop_mode = crop_mode;
-            mutex.post();
 
             return true;
         }
 
         void interrupt()
         {
-            mutex.wait();
-
+            lock_guard<mutex> lck(mtx);
             BufferedPort<Image>::interrupt();
 
             port_in_centroid.interrupt();
@@ -453,14 +437,11 @@ public:
             port_out_view.interrupt();
             port_out_scores.interrupt();
             port_out_hist.interrupt();
-
-            mutex.post();
         }
 
         void resume()
         {
-            mutex.wait();
-
+            lock_guard<mutex> lck(mtx);
             BufferedPort<Image>::resume();
 
             port_in_centroid.resume();
@@ -469,14 +450,11 @@ public:
             port_out_view.resume();
             port_out_scores.resume();
             port_out_hist.resume();
-
-            mutex.post();
         }
 
         void close()
         {
-            mutex.wait();
-
+            lock_guard<mutex> lck(mtx);
             BufferedPort<Image>::close();
 
             port_in_centroid.close();
@@ -487,8 +465,6 @@ public:
             port_out_hist.close();
 
             delete[] labels;
-
-            mutex.post();
         }
 
     };
@@ -496,8 +472,7 @@ public:
     class ObjectRecognizerModule: public RFModule
     {
     protected:
-
-        Semaphore              mutex;
+        mutex                  mtx;
 
         ObjectRecognizerPort   *imagePort;
 
@@ -580,9 +555,7 @@ public:
 
             if (command.size()>0)
             {
-
-                mutex.wait();
-
+                lock_guard<mutex> lck(mtx);
                 switch(command.get(0).asVocab())
                 {
 
@@ -683,10 +656,7 @@ public:
 
                 }
 
-                mutex.post();
-
                 rpcPortHuman.reply(reply);
-
             }
 
             return true;
