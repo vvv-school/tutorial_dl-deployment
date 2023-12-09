@@ -55,7 +55,7 @@ add_executable(${PROJECT_NAME} ${folder_source} ${folder_header})
 target_compile_definitions(${PROJECT_NAME} PRIVATE ${Caffe_DEFINITIONS})
 
 target_link_libraries(${PROJECT_NAME} ${YARP_LIBRARIES})
-target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
 target_link_libraries(${PROJECT_NAME} ${Caffe_LIBRARIES})
 
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
